@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import Book
+from books.models import Book
 from authors.models import Author
 import uuid
 from datetime import datetime
