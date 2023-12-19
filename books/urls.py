@@ -1,6 +1,11 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import AvailableBooksList
 from .views import BooksByAuthorAPIView
+from .views import BookViewSet
+
+router = DefaultRouter()
+router.register(r'', BookViewSet, basename='book')
 
 urlpatterns = [
     path(
@@ -12,5 +17,7 @@ urlpatterns = [
         'author/<str:author_name>',
         BooksByAuthorAPIView.as_view(),
         name='books_by_author'
-    )
+    ),
+
+    path('', include(router.urls)),
 ]
