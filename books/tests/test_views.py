@@ -1,4 +1,4 @@
-from django.test import TestCase
+from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
@@ -9,7 +9,7 @@ from datetime import datetime
 import uuid
 
 
-class AvailableBooksListTest(TestCase):
+class AvailableBooksListTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
         test_author = Author.objects.create(name='Charlie')
@@ -47,3 +47,75 @@ class AvailableBooksListTest(TestCase):
         response_data = response.data
 
         self.assertEqual(response_data, expected_data)
+
+
+class BookViewSetTestCase(APITestCase):
+
+    def setUp(self):
+        self.test_author = Author.objects.create(name='Charlie')
+        self.book_data = {
+            'title': 'A sniper\'s paradise',
+            'author': self.test_author.id,
+            'pages': 234,
+            'type': 'paperback',
+            'releasedAt': '2023-08-12T09:10:00Z'
+        }
+        self.book = Book.objects.create(
+            owl_id=uuid.uuid4(),
+            title='A sniper\'s paradise',
+            author=self.test_author,
+            pages=234,
+            type='paperback',
+            releasedAt=datetime.now()
+        )
+
+    def test_get_books(self):
+        response = self.client.get(reverse('book-list'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Book.objects.count(), len(response.data))
+
+    def test_create_book(self):
+        response = self.client.post(reverse('book-list'), self.book_data)
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Book.objects.count(), 2)
+
+    def test_retrieve_book(self):
+        response = self.client.get(
+            reverse('book-detail', args=[self.book.owl_id]))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], 'A sniper\'s paradise')
+
+    def test_patch_book(self):
+        update_data = {'title': 'A Sniper\'s paradise'}
+        response = self.client.patch(
+            reverse('book-detail', args=[self.book.owl_id]), update_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.book.refresh_from_db()
+        self.assertEqual(self.book.title, 'A Sniper\'s paradise')
+
+    def test_update_book(self):
+        update_data = {
+            'title': 'A sniper\'s paradise',
+            'author': self.test_author.id,
+            'pages': 243,
+            'type': 'hardcover',
+            'releasedAt': '2022-08-12T09:10:00Z'
+        }
+        response = self.client.put(
+            reverse('book-detail', args=[self.book.owl_id]), update_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.book.refresh_from_db()
+        self.assertEqual(self.book.title, 'A sniper\'s paradise')
+        self.assertEqual(self.book.author.name, 'Charlie')
+        self.assertEqual(self.book.pages, 243)
+        self.assertEqual(self.book.type, 'hardcover')
+        self.assertEqual(self.book.releasedAt.replace(
+            tzinfo=None).isoformat() + 'Z', '2022-08-12T09:10:00Z')
+
+    def test_delete_book(self):
+        # Test deleting a book
+        response = self.client.delete(
+            reverse('book-detail', args=[self.book.owl_id]))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Book.objects.count(), 0)
