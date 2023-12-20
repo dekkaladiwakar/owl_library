@@ -77,7 +77,6 @@ class BorrowBookAPIView(APIView):
                 Lending.objects.create(
                     book=book, user=user,
                     borrowedAt=datetime.now(),
-                    returnedAt=datetime.now() + timedelta(days=14)
                 )
 
                 # 5. Set the book as not available
