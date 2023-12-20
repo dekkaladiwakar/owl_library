@@ -138,3 +138,45 @@ class BorrowBookAPITestCase(APITestCase):
         data = {'owl_id': str(uuid.uuid4()), 'user_id': self.user.id}
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class ReturnBookAPITestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(name='John Wick')
+        self.author = Author.objects.create(name='Charlie')
+        self.book = Book.objects.create(
+            owl_id=uuid.uuid4(),
+            author=self.author,
+            title='A sniper\'s paradise',
+            pages=357,
+            type='paperback',
+            releasedAt=datetime.now()
+        )
+        self.lending = Lending.objects.create(
+            user=self.user, book=self.book, borrowedAt=timezone.now())
+        self.url = reverse('return_book')
+
+    def test_return_book_pass(self):
+        data = {'owl_id': str(self.book.owl_id), 'user_id': self.user.id}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.lending.refresh_from_db()
+        self.assertIsNotNone(self.lending.returnedAt)
+
+    def test_return_book_already_returned(self):
+        self.lending.returnedAt = timezone.now()
+        self.lending.save()
+        data = {'owl_id': str(self.book.owl_id), 'user_id': self.user.id}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], 'Book is already returned')
+
+    def test_return_book_user_not_found(self):
+        data = {'owl_id': str(self.book.owl_id), 'user_id': 2}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_return_book_not_found(self):
+        data = {'owl_id': str(uuid.uuid4()), 'user_id': self.user.id}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

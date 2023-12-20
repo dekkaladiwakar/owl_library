@@ -102,7 +102,7 @@ class BorrowBookAPIView(APIView):
 
 
 class ReturnBookAPIView(APIView):
-    def get(self, request):
+    def post(self, request):
         try:
             owl_id = request.data.get('owl_id')
             user_id = request.data.get('user_id')
