@@ -48,10 +48,54 @@ class BorrowBookAPIView(APIView):
                 book.is_available = False
                 book.save()
 
-                return Response(
-                    {'message': 'Book borrowed successfully'},
-                    status=status.HTTP_200_OK
-                )
+            return Response(
+                {'message': 'Book borrowed successfully'},
+                status=status.HTTP_200_OK
+            )
+
+        except User.DoesNotExist:
+            return Response(
+                {'error': 'User not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Book.DoesNotExist:
+            return Response(
+                {'error': 'Book not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class ReturnBookAPIView(APIView):
+    def get(self, request):
+        try:
+            owl_id = request.data.get('owl_id')
+            user_id = request.data.get('user_id')
+
+            user = User.objects.get(id=user_id)
+
+            with transaction.atomic():
+                book = Book.objects.get(owl_id=owl_id)
+
+                latest_lending = Lending.objects.filter(
+                    user=user, book=book).order_by('-borrowedAt').first()
+
+                if latest_lending.returnedAt:
+                    return Response(
+                        {'message': 'Book is already returned'},
+                        status=status.HTTP_200_OK
+                    )
+
+                latest_lending.returnedAt = datetime.now()
+                latest_lending.save()
+
+                book.is_available = True
+                book.save()
+
+            return Response(
+                {'message': 'Book returned successfully'},
+                status=status.HTTP_200_OK
+            )
+
         except User.DoesNotExist:
             return Response(
                 {'error': 'User not found'},
@@ -67,9 +111,11 @@ class BorrowBookAPIView(APIView):
 class ReborrowingEligibilityAPIView(APIView):
     def get(self, request, owl_id, user_id):
         try:
+            user = User.objects.get(id=user_id)
             book = Book.objects.get(owl_id=owl_id)
+
             latest_lending = Lending.objects.filter(
-                user_id=user_id, book=book).order_by('-borrowedAt').first()
+                user=user, book=book).order_by('-borrowedAt').first()
 
             if not latest_lending:
                 return Response({'eligible': True})
@@ -92,6 +138,11 @@ class ReborrowingEligibilityAPIView(APIView):
                     'eligible_from': threshold_date.isoformat()
                 })
 
+        except User.DoesNotExist:
+            return Response(
+                {'error': 'User not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
         except Book.DoesNotExist:
             return Response(
                 {'error': 'Book not found'},
