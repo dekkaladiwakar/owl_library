@@ -20,5 +20,8 @@ class Book(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        unique_together = ('title', 'author')
+
     def __str__(self):
         return self.title

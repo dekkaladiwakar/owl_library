@@ -1,8 +1,9 @@
 from django.test import TestCase
 from books.models import Book
 from authors.models import Author
-import uuid
+from django.core.exceptions import ValidationError
 from datetime import datetime
+import uuid
 
 
 class BookModelTest(TestCase):
@@ -42,6 +43,27 @@ class BookModelTest(TestCase):
         self.assertEquals(
             self.test_book.releasedAt, datetime(2023, 12, 19, 1, 1)
         )
+
+    # To test the unique_together constraint in Book model
+    def test_unique_title_for_same_author(self):
+        Book.objects.create(
+            owl_id=uuid.uuid4(),
+            title='A not so Unique name',
+            author=self.test_author,
+            pages=100,
+            type='hardcover',
+            releasedAt=datetime.now()
+        )
+        with self.assertRaises(ValidationError):
+            book = Book(title='A not so Unique name', author=self.test_author)
+
+            # This should raise a ValidationError
+            # as it check for models field validations
+            book.full_clean()
+
+            # This will raise an IntegrityError
+            # book.save()
+
 
     def test_str_method(self):
         self.assertEquals(str(self.test_book), 'Tale of a Tornado')

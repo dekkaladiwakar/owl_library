@@ -19,7 +19,7 @@ class BookViewSetTestCase(APITestCase):
         # Didn't include owl_id as it will be created while using Client
         # Using Author ID as the API accepts id instead of an instance
         self.book_data = {
-            'title': 'A sniper\'s paradise',
+            'title': 'A sniper\'s paradise- Part 2',
             'author': self.test_author.id,
             'pages': 234,
             'type': 'paperback',

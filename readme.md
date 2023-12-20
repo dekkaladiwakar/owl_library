@@ -31,12 +31,12 @@ Follow the installation instructions for Django and PostgreSQL.
 - Borrow Book: `POST /act/borrow/`
   - Request Body (JSON):
     - `owl_id` (string): Unique ID of the book
-    - `user_id` (string): Unique ID of the user
+    - `user_id` (number): Unique ID of the user
 
 - Return Book: `POST /act/return/`
   - Request Body (JSON):
     - `owl_id` (string): Unique ID of the book
-    - `user_id` (string): Unique ID of the user
+    - `user_id` (number): Unique ID of the user
 - View all borrowings by user: `GET /act/borrow/user/<user-id>/all`
 - View active borrowings by user: `GET /act/borrow/user/<user-id>/active`
 
