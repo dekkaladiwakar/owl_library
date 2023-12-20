@@ -4,9 +4,45 @@ from rest_framework import status
 from users.models import User
 from books.models import Book
 from .models import Lending
+from .serializers import LendingSerializer
 from django.utils import timezone
 from django.db import transaction
 from datetime import timedelta, datetime
+
+
+class GetActiveBorrowedBooksAPIView(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+
+            active_borrowed_books = Lending.objects.filter(
+                user=user,
+                returnedAt=None
+            )
+            serializer = LendingSerializer(active_borrowed_books, many=True)
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            return Response(
+                {'error': 'User not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class GetAllBorrowedBooksAPIView(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+
+            borrowed_books = Lending.objects.filter(
+                user=user,
+            )
+            serializer = LendingSerializer(borrowed_books, many=True)
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            return Response(
+                {'error': 'User not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class BorrowBookAPIView(APIView):

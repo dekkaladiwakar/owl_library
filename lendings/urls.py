@@ -1,6 +1,11 @@
 from django.urls import path
-from .views import (ReborrowingEligibilityAPIView,
-                    BorrowBookAPIView, ReturnBookAPIView)
+from .views import (
+    ReborrowingEligibilityAPIView,
+    BorrowBookAPIView,
+    ReturnBookAPIView,
+    GetActiveBorrowedBooksAPIView,
+    GetAllBorrowedBooksAPIView
+)
 
 urlpatterns = [
     path(
@@ -17,5 +22,15 @@ urlpatterns = [
         'return/',
         ReturnBookAPIView.as_view(),
         name='return_book'
+    ),
+    path(
+        'borrow/user/<str:user_id>/active',
+        GetActiveBorrowedBooksAPIView.as_view(),
+        name='get_active_borrowed_books'
+    ),
+    path(
+        'borrow/user/<str:user_id>/all',
+        GetAllBorrowedBooksAPIView.as_view(),
+        name='get_all_borrowed_books'
     )
 ]
