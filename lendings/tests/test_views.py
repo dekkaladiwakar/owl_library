@@ -44,7 +44,7 @@ class ReborrowingEligibilityAPITestCase(APITestCase):
 
     def test_eligibility_no_prior_borrowing(self):
         response = self.client.get(reverse('reborrowing_eligibility', args=[
-                                   self.book.owl_id, self.user.id]))
+                                   self.book.owl_id, self.user.name]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['eligible'], True)
 
@@ -54,7 +54,7 @@ class ReborrowingEligibilityAPITestCase(APITestCase):
             borrowedAt=timezone.now() - self.three_months
         )
         response = self.client.get(reverse('reborrowing_eligibility', args=[
-                                   self.book.owl_id, self.user.id]))
+                                   self.book.owl_id, self.user.name]))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['eligible'], True)
@@ -63,7 +63,7 @@ class ReborrowingEligibilityAPITestCase(APITestCase):
         Lending.objects.create(book=self.book, user=self.user,
                                borrowedAt=timezone.now() - timedelta(days=30))
         response = self.client.get(reverse('reborrowing_eligibility', args=[
-                                   self.book.owl_id, self.user.id]))
+                                   self.book.owl_id, self.user.name]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['eligible'], False)
 
@@ -73,7 +73,7 @@ class ReborrowingEligibilityAPITestCase(APITestCase):
             borrowedAt=timezone.now() - self.six_months
         )
         response = self.client.get(reverse('reborrowing_eligibility', args=[
-                                   self.book_2.owl_id, self.user.id]))
+                                   self.book_2.owl_id, self.user.name]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['eligible'], True)
 
@@ -83,7 +83,7 @@ class ReborrowingEligibilityAPITestCase(APITestCase):
             borrowedAt=timezone.now() - self.three_months
         )
         response = self.client.get(reverse('reborrowing_eligibility', args=[
-                                   self.book_2.owl_id, self.user.id]))
+                                   self.book_2.owl_id, self.user.name]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['eligible'], False)
 
@@ -91,7 +91,7 @@ class ReborrowingEligibilityAPITestCase(APITestCase):
         invalid_uuid_value = uuid.uuid4()
         response = self.client.get(
             reverse('reborrowing_eligibility', args=[
-                invalid_uuid_value, self.user.id
+                invalid_uuid_value, self.user.name
             ]))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 

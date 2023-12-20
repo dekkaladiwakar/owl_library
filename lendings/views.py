@@ -65,7 +65,7 @@ class BorrowBookAPIView(APIView):
                 # 3. Check if the user is eligible to borrow the book
                 eligibility_view = ReborrowingEligibilityAPIView()
                 eligibility_response = eligibility_view.get(
-                    request, book.owl_id, user.id)
+                    request, book.owl_id, user.name)
 
                 if not eligibility_response.data['eligible']:
                     return Response(
@@ -145,9 +145,9 @@ class ReturnBookAPIView(APIView):
 
 
 class ReborrowingEligibilityAPIView(APIView):
-    def get(self, request, owl_id, user_id):
+    def get(self, request, owl_id, user_name):
         try:
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(name=user_name)
             book = Book.objects.get(owl_id=owl_id)
 
             latest_lending = Lending.objects.filter(

@@ -27,7 +27,7 @@ Follow the installation instructions for Django and PostgreSQL.
 - Books CRUD: `/book/`
 - View available books: `GET /book/available/`
 - View books by author: `GET /book/author/<author-name>`
-- Check borrowing eligibility: `GET /act/eligible/book/<book-owl-id>/user/<user-id>`
+- Check borrowing eligibility: `GET /act/eligible/book/<book-owl-id>/user/<user-name>`
 - Borrow Book: `POST /act/borrow/`
   - Request Body (JSON):
     - `owl_id` (string): Unique ID of the book

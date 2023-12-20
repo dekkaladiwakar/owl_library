@@ -64,6 +64,5 @@ class BookModelTest(TestCase):
             # This will raise an IntegrityError
             # book.save()
 
-
     def test_str_method(self):
         self.assertEquals(str(self.test_book), 'Tale of a Tornado')

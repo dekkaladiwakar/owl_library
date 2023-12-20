@@ -9,7 +9,7 @@ from .views import (
 
 urlpatterns = [
     path(
-        'eligible/book/<str:owl_id>/user/<str:user_id>/',
+        'eligible/book/<str:owl_id>/user/<str:user_name>/',
         ReborrowingEligibilityAPIView.as_view(),
         name='reborrowing_eligibility'
     ),
