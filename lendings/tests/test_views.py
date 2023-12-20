@@ -140,6 +140,11 @@ class BorrowBookAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
+# Test Cases:
+# 1. Return a book- Pass
+# 2. Book is already returned
+# 3. User is not found
+# 4. Book is not found
 class ReturnBookAPITestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(name='John Wick')
