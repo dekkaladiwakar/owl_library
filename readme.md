@@ -25,15 +25,17 @@ Follow the installation instructions for Django and PostgreSQL.
 - Users CRUD: `/user/`
 - Authors CRUD: `/author/`
 - Books CRUD: `/book/`
-- View available books: `GET /book/available/`
-- View books by author: `GET /book/author/<author-name>`
-- Check borrowing eligibility: `GET /act/eligible/book/<book-owl-id>/user/<user-name>`
-- Borrow Book: `POST /act/borrow/`
+- View available books: `GET /book/available/` ___(Assignment)___
+- View books by author: `GET /book/author/<author-name>` ___(Assignment)___
+- Check borrowing eligibility: `GET /act/eligible/book/<book-owl-id>/user/<user-name>` ___(Assignment)___
+
+- Borrow Book: `POST /act/borrow/` ___(Assignment)___
+
   - Request Body (JSON):
     - `owl_id` (string): Unique ID of the book
     - `user_id` (number): Unique ID of the user
 
-- Return Book: `POST /act/return/`
+- Return Book: `POST /act/return/` ___(Assignment)___
   - Request Body (JSON):
     - `owl_id` (string): Unique ID of the book
     - `user_id` (number): Unique ID of the user
