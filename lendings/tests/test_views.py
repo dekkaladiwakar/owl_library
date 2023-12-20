@@ -94,3 +94,47 @@ class ReborrowingEligibilityAPITestCase(APITestCase):
                 invalid_uuid_value, self.user.id
             ]))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+# Test Cases:
+# 1. Borrow a book- Pass
+# 2. Book is unavailable- Fail
+# 3. User is not found
+# 4. Book is not found
+class BorrowBookAPITestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(name='John Wick')
+        self.author = Author.objects.create(name='Charlie')
+        self.book = Book.objects.create(
+            owl_id=uuid.uuid4(),
+            author=self.author,
+            title='A sniper\'s paradise',
+            pages=357,
+            type='paperback',
+            releasedAt=datetime.now()
+        )
+        self.url = reverse('borrow_book')
+
+    def test_borrow_book_pass(self):
+        data = {'owl_id': str(self.book.owl_id), 'user_id': self.user.id}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.book.refresh_from_db()
+        self.assertFalse(self.book.is_available)
+
+    def test_borrow_book_unavailable(self):
+        self.book.is_available = False
+        self.book.save()
+        data = {'owl_id': str(self.book.owl_id), 'user_id': self.user.id}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_borrow_book_user_not_found(self):
+        data = {'owl_id': str(self.book.owl_id), 'user_id': 2}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_borrow_book_not_found(self):
+        data = {'owl_id': str(uuid.uuid4()), 'user_id': self.user.id}
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
