@@ -5,5 +5,7 @@ Authors:
 1. Authors CRUD: /author/
 Books:
 1. Books CRUD: /book/
-2. /book/available/
-3. /book/author/<author-name>
+2. GET /book/available/
+3. GET /book/author/<author-name>
+Lending: (act- Action)
+1. GET /act/eligible/book/<book-owl-id>/user/<user-id>
